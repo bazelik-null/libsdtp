@@ -31,9 +31,6 @@ sdtp_instance_t* sdtp_instance_create(const sdtp_config_t* config) {
 		return NULL;
 	}
 
-	// Seed RNG
-	srand(time(NULL));
-
 	return instance;
 }
 
@@ -46,4 +43,5 @@ void sdtp_instance_close(sdtp_instance_t* instance) {
 	instance->output_buffer = NULL;
 
 	free(instance);
+	instance = NULL;
 }

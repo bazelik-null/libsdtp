@@ -30,7 +30,6 @@ sdtp_buffer_t* sdtp_buffer_create(const sdtp_config_t* config, const sdtp_buffer
 	}
 
 	// Set pointers
-	buffer->head = buffer->data;
 	buffer->tail = buffer->data;
 
 	// Init variables
@@ -47,7 +46,6 @@ void sdtp_buffer_free (sdtp_buffer_t* buffer) {
 	if (buffer->data) free(buffer->data);
 
 	// Set pointers to null
-	buffer->head = NULL;
 	buffer->tail = NULL;
 	buffer->data = NULL;
 
@@ -76,7 +74,7 @@ size_t sdtp_buffer_write(sdtp_instance_t* instance, const sdtp_buffer_type_t buf
 
 		// Write new data
 		memcpy(buffer->data, source, write_len);
-		buffer->tail = buffer->head + write_len;
+		buffer->tail = buffer->data + write_len;
 
 		return write_len;
 	}
@@ -136,11 +134,11 @@ void sdtp_buffer_clear(sdtp_instance_t* instance, const sdtp_buffer_type_t buffe
 
 	// Remove used space
 	memset(buffer->data, 0, used);
-	buffer->tail = buffer->head;
+	buffer->tail = buffer->data;
 }
 
 size_t sdtp_buffer_get_used_space(const sdtp_buffer_t* buffer) {
-	return buffer->tail - buffer->head;
+	return buffer->tail - buffer->data;
 }
 
 sdtp_buffer_t* sdtp_buffer_get_by_type(sdtp_instance_t* instance, const sdtp_buffer_type_t buffer_type) {

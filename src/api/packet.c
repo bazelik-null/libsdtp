@@ -3,41 +3,51 @@
 //
 
 #include <api/libsdtp.h>
+#include <drivers/libsdtp_hal.h>
 
 #include <stdlib.h>
 #include <string.h>
 
-sdtp_packet_t* sdtp_construct_packet(const uint8_t* data, const uint32_t data_len, const sdtp_packet_type_t packet_type)
+sdtp_packet_t* sdtp_construct_packet(const char* data, const sdtp_packet_type_t packet_type)
 {
-	if (!data && data_len > 0) return NULL;
+	if (!data) return NULL;
+
+	size_t body_size = 0;
+	uint8_t* body = sdtp_char_to_bytes(data, &body_size);
+	if (!body) return NULL;
 
 	// Allocate packet struct
 	sdtp_packet_t* packet = (sdtp_packet_t*)malloc(sizeof(sdtp_packet_t));
-	if (!packet) return NULL;
+	if (!packet) {
+		free(body);
+		return NULL;
+	}
 
 	const uint32_t checksum = 0; // TODO: Calculate checksum
 
 	// Header fields
-	packet->header.id        = (uint32_t)rand();      // Random ID
-	packet->header.data_size = data_len;              // Copy data len
+	packet->header.id        = (uint32_t)sdtp_hal_rand();      // Random ID
+	packet->header.data_size = body_size;              // Copy data len
 	packet->header.type      = (uint32_t)packet_type; // Copy packet type
 	packet->header.checksum  = checksum;              // Calculated data checksum
 
-	if (data_len > 0) {
+	if (body_size > 0) {
 		// Allocate body
-		packet->body = (uint8_t*)malloc(data_len);
+		packet->body = (uint8_t*)malloc(body_size);
 		// If allocation failed
 		if (!packet->body) {
 			free(packet);
+			free(body);
 			return NULL;
 		}
 
 		// Copy data into a packet body
-		memcpy(packet->body, data, data_len);
+		memcpy(packet->body, body, body_size);
 	} else {
 		packet->body = NULL;
 	}
 
+	free(body);
 	return packet;
 }
 
@@ -57,14 +67,6 @@ uint8_t* sdtp_serialize_packet(const sdtp_packet_t* packet, size_t* out_size) {
 
     // Validate body pointer when data_size > 0
     if (packet->header.data_size > 0 && packet->body == NULL) return NULL;
-
-    /*
-     * Serialized layout:
-     * Start of heading: 1 byte
-     * Header: 4 * uint32_t (id, data_size, type, checksum)
-     * Body: data_size bytes
-     * Terminator: 1 byte
-     */
 
     const size_t header_bytes = 4 * sizeof(uint32_t);
     const uint32_t data_size = packet->header.data_size;
@@ -121,7 +123,6 @@ uint8_t* sdtp_serialize_packet(const sdtp_packet_t* packet, size_t* out_size) {
 	const uint8_t terminator = SDTP_TERMINATOR;
 	if (remaining < 1) { free(buffer); return NULL; }
 	memcpy(write_ptr, &terminator, 1);
-	write_ptr += 1;
 	remaining -= 1;
 
     // Check if all data was written

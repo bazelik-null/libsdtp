@@ -6,7 +6,8 @@
 
 #include <stdlib.h>
 
-sdtp_error_t sdtp_write_packet(sdtp_instance_t* instance, const sdtp_packet_t* packet) {
+// TODO: Call HAL and send data.
+sdtp_status_code_t sdtp_write_packet(sdtp_instance_t* instance, const sdtp_packet_t* packet) {
 	if (!instance || !packet) return SDTP_UNDEFINED;
 
 	// Serialize packet into a temporary buffer
@@ -30,7 +31,8 @@ sdtp_error_t sdtp_write_packet(sdtp_instance_t* instance, const sdtp_packet_t* p
 	return SDTP_OK;
 }
 
-sdtp_packet_t* sdtp_read_packet(sdtp_instance_t* instance) {
+// TODO: Call HAL and read data.
+sdtp_packet_t* sdtp_read_packet(sdtp_instance_t* instance, sdtp_read_mode_t mode) {
 	if (!instance) return NULL;
 
 	const size_t read_len = sdtp_buffer_get_used_space(instance->input_buffer);
@@ -38,7 +40,7 @@ sdtp_packet_t* sdtp_read_packet(sdtp_instance_t* instance) {
 	// Allocate serialized buffer and copy packet bytes
 	uint8_t* serialized = (uint8_t*)malloc(read_len);
 	if (!serialized) return NULL;
-	const size_t serialized_len = sdtp_buffer_read(instance, SDTP_INPUT_BUFFER, serialized, read_len, SDTP_READ_PARTIAL);
+	const size_t serialized_len = sdtp_buffer_read(instance, SDTP_INPUT_BUFFER, serialized, read_len, mode);
 
 	// Deserialize
 	sdtp_packet_t* packet = sdtp_deserialize_packet(serialized, serialized_len);
