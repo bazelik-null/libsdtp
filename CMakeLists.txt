@@ -7,7 +7,8 @@ add_library(sdtp SHARED
         src/api/buffer.c
         src/api/packet.c
         src/api/instance.c
-        src/api/buffer_api.c)
+        src/api/buffer_api.c
+        src/api/misc.c)
 
 set_target_properties(sdtp PROPERTIES VERSION ${PROJECT_VERSION})
 set_target_properties(sdtp PROPERTIES PUBLIC_HEADER include/api/libsdtp.h)

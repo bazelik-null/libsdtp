@@ -237,6 +237,14 @@ sdtp_error_t sdtp_write_packet(sdtp_instance_t* instance, const sdtp_packet_t* p
  **/
 sdtp_packet_t* sdtp_read_packet(sdtp_instance_t* instance);
 
+// MISC //
+
+/**
+ * Returns packet data as char.
+ * Caller must free returned pointer
+ */
+char* sdtp_get_char_data(const sdtp_packet_t* packet);
+
 #ifdef __cplusplus
 }
 #endif
