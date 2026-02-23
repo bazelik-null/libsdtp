@@ -8,7 +8,10 @@ add_library(sdtp SHARED src/libsdtp.c)
 set_target_properties(sdtp PROPERTIES VERSION ${PROJECT_VERSION})
 set_target_properties(sdtp PROPERTIES PUBLIC_HEADER src/libsdtp.h)
 
-target_include_directories(sdtp PRIVATE src)
+target_include_directories(sdtp PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+)
 
 include(GNUInstallDirs)
 install(TARGETS sdtp
