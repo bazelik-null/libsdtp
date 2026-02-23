@@ -1,0 +1,14 @@
+{
+  "name": "libsdtp",
+  "version": "0.0.1",
+  "description": "SDTP Protocol Library",
+  "keywords": "sdtp, protocol",
+  "repository":
+  {
+    "type": "git",
+    "url": "https://github.com/bazelik-null/libsdtp.git"
+  },
+  "license": "MIT",
+  "frameworks": "*",
+  "platforms": "*"
+}
