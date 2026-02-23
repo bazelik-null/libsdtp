@@ -2,7 +2,7 @@
 // Created by niko on 23.02.2026.
 //
 
-#include <include/api/libsdtp.h>
+#include <api/libsdtp.h>
 
 #include <stdlib.h>
 

@@ -10,5 +10,6 @@
   },
   "license": "MIT",
   "frameworks": "*",
-  "platforms": "*"
+  "platforms": "*",
+  "include": "include"
 }

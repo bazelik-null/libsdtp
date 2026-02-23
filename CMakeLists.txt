@@ -12,7 +12,7 @@ add_library(sdtp SHARED
 set_target_properties(sdtp PROPERTIES VERSION ${PROJECT_VERSION})
 set_target_properties(sdtp PROPERTIES PUBLIC_HEADER include/api/libsdtp.h)
 
-include_directories(${CMAKE_SOURCE_DIR})
+include_directories(${CMAKE_SOURCE_DIR}/include)
 target_include_directories(sdtp PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
