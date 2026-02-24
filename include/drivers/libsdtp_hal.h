@@ -18,6 +18,10 @@ extern "C" {
 // !!! WORK IN PROGRESS !!!
 
 /**
+ * For data encoding SDTP uses Manchester encoding with IEEE 802.3 standard.
+ **/
+
+/**
  * Structure with array of bitwise commands for data transmission.
  * One element (uint8_t) holds 8 commands (bits)
  **/
@@ -47,21 +51,31 @@ uint8_t* sdtp_hal_convert_from_bit_stream(const sdtp_hal_bit_stream_t* source);
  * Sends data to specified channel.
  * @param source Bit stream to send.
  * @param channel Channel (pin) to write.
+ * @param baud_rate Baud rate.
  **/
-void sdtp_hal_write_bytes(const sdtp_hal_bit_stream_t* source, uint8_t channel);
+void sdtp_hal_transmit(const sdtp_hal_bit_stream_t* source, uint8_t channel, uint32_t baud_rate);
 /**
  * Reads data from specified channel.
  * Caller must free returned pointer.
  * @param channel Channel (pin) to read.
+ * @param baud_rate Baud rate.
  * @return Read bit stream.
  **/
-sdtp_hal_bit_stream_t* sdtp_hal_read_bytes(uint8_t channel);
+sdtp_hal_bit_stream_t* sdtp_hal_receive(uint8_t channel, uint32_t baud_rate);
+
+/**
+ * Frees bit stream.
+ */
+void sdtp_hal_free_bit_stream(sdtp_hal_bit_stream_t* stream);
+
+void sdtp_hal_transmit_zero(uint8_t channel, uint32_t delay);
+void sdtp_hal_transmit_one(uint8_t channel, uint32_t delay);
 
 /**
  * Generates a random value.
  * @return Value.
  */
-int sdtp_hal_rand();
+uint32_t sdtp_hal_rand();
 
 #ifdef __cplusplus
 }
