@@ -207,13 +207,7 @@ sdtp_packet_t* sdtp_deserialize_packet(const uint8_t* buffer, const size_t buf_s
     }
 
     // Check terminator
-    if (remaining < 1) {
-        if (packet->body) free(packet->body);
-
-        free(packet);
-        return NULL;
-    }
-    if (*read_ptr != SDTP_TERMINATOR) {
+    if (remaining < 1 || *read_ptr != SDTP_TERMINATOR) {
         if (packet->body) free(packet->body);
 
         free(packet);

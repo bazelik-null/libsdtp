@@ -11,14 +11,14 @@ char* sdtp_get_char_data(const sdtp_packet_t* packet) {
 	if (packet == NULL) return NULL;
 
 	const uint8_t* body = packet->body;
+	if (body == NULL) return NULL;
 
 	// Allocate a buffer for a null-terminated string
 	char* body_buffer = malloc(packet->header.data_size + 1);
+	if (body_buffer == NULL) return NULL;
 
 	// Copy the bytes to a buffer
-	for (int i = 0; i < packet->header.data_size; i++) {
-		body_buffer[i] = (char)body[i];
-	}
+	memcpy(body_buffer, body, packet->header.data_size);
 
 	// Null-terminate the string
 	body_buffer[packet->header.data_size] = '\0';
@@ -31,15 +31,15 @@ uint8_t* sdtp_char_to_bytes(const char* source, size_t* data_len) {
 
 	*data_len = strlen(source);
 
-	// Allocate a buffer for the uint8_t array
-	uint8_t* byte_buffer = malloc(*data_len);
+	if (*data_len == 0) {
+		return NULL;
+	}
 
+	uint8_t* byte_buffer = malloc(*data_len);
 	if (byte_buffer == NULL) return NULL;
 
-	// Copy the characters to the byte buffer
-	for (size_t i = 0; i < *data_len; i++) {
-		byte_buffer[i] = (uint8_t)source[i];
-	}
+	// Copy the bytes to a buffer
+	memcpy(byte_buffer, (const uint8_t*)source, *data_len);
 
 	return byte_buffer;
 }
