@@ -1,0 +1,13 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- Created using Krita: https://krita.org -->
+<svg xmlns="http://www.w3.org/2000/svg" 
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:krita="http://krita.org/namespaces/svg/krita"
+    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+    width="216pt"
+    height="216pt"
+    viewBox="0 0 216 216">
+<defs/>
+<rect id="shape0" transform="translate(19.44, 20.88)" fill="none" stroke="#ffffff" stroke-width="360" stroke-linecap="square" stroke-linejoin="bevel" width="180" height="180"/><text id="shape01" krita:useRichText="true" text-rendering="auto" krita:textVersion="3" transform="translate(49.035, 118.873125)" fill="#000000" stroke-opacity="0" stroke="#000000" stroke-width="0" stroke-linecap="square" stroke-linejoin="bevel" letter-spacing="0" text-anchor="middle" word-spacing="0" style="text-align: start;text-align-last: auto;font-family: LanaPixel;font-size: 48;"><tspan x="61.125"><tspan>lib</tspan><tspan fill="#003052">sdtp</tspan></tspan></text><text id="shape1" krita:useRichText="true" text-rendering="auto" krita:textVersion="3" transform="translate(63.2217194564669, 128.114806690162)" fill="#000000" stroke-opacity="0" stroke="#000000" stroke-width="0" stroke-linecap="square" stroke-linejoin="bevel" kerning="none" letter-spacing="0" text-anchor="middle" word-spacing="0" style="text-align: start;text-align-last: auto;font-family: LanaPixel;font-size: 12;"><tspan x="41.408203125">Work In Progress</tspan></text>
+</svg>
