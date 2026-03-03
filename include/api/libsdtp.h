@@ -221,23 +221,21 @@ void sdtp_buffer_free(sdtp_buffer_t* buffer);
 
 /**
  * Writes byte stream into the buffer.
- * @param instance SDTP instance.
- * @param buffer_type Buffer type (either input or output) (enum sdtp_buffer_type_t).
+ * @param buffer Buffer to write.
  * @param source Buffer with data to write.
  * @param write_len Buffer length.
  * @return Written length.
  **/
-size_t sdtp_buffer_write(sdtp_instance_t* instance, sdtp_buffer_type_t buffer_type, const uint8_t* source, size_t write_len);
+size_t sdtp_buffer_write(sdtp_buffer_t* buffer, const uint8_t* source, size_t write_len);
 /**
  * Reads byte stream from the buffer and returns read length.
- * @param instance SDTP instance.
- * @param buffer_type Buffer type (either input or output) (enum sdtp_buffer_type_t).
+ * @param buffer Buffer to read.
  * @param destination Buffer into which data will be copied.
  * @param read_len Length to read.
  * @param mode Reading mode (enum sdtp_read_mode_t).
  * @return Read length.
  **/
-size_t sdtp_buffer_read(sdtp_instance_t* instance, sdtp_buffer_type_t buffer_type, uint8_t* destination, size_t read_len, sdtp_read_mode_t mode);
+size_t sdtp_buffer_read(sdtp_buffer_t* buffer, uint8_t* destination, size_t read_len, sdtp_read_mode_t mode);
 
 /**
  * Clears buffer.

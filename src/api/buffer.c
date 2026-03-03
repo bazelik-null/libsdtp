@@ -8,28 +8,21 @@
 #include <string.h>
 
 sdtp_buffer_t* sdtp_buffer_create(const sdtp_config_t* config, const sdtp_buffer_type_t type) {
+	if (config->buffer_size <= 0) return NULL;
+
 	// Allocate buffer struct
 	sdtp_buffer_t* buffer = malloc(sizeof(sdtp_buffer_t));
 	if (!buffer) {
-		free(buffer);
-
 		return NULL;
 	}
 
-	if (config->buffer_size > 0) {
-		// Allocate data
-		buffer->data = (uint8_t*)calloc(config->buffer_size, sizeof(uint8_t));
-		if (!buffer->data) {
-			free(buffer->data);
-			free(buffer);
-
-			return NULL;
-		}
-	} else {
-		buffer->data = NULL;
+	// Allocate data
+	buffer->data = (uint8_t*)calloc(config->buffer_size, sizeof(uint8_t));
+	if (!buffer->data) {
+		free(buffer);
+		return NULL;
 	}
 
-	// Set pointers
 	buffer->tail = buffer->data;
 
 	// Init variables
@@ -39,7 +32,7 @@ sdtp_buffer_t* sdtp_buffer_create(const sdtp_config_t* config, const sdtp_buffer
 	return buffer;
 }
 
-void sdtp_buffer_free (sdtp_buffer_t* buffer) {
+void sdtp_buffer_free(sdtp_buffer_t* buffer) {
 	if (!buffer) return;
 
 	// Free data
@@ -53,16 +46,8 @@ void sdtp_buffer_free (sdtp_buffer_t* buffer) {
 	free(buffer);
 }
 
-size_t sdtp_buffer_write(sdtp_instance_t* instance, const sdtp_buffer_type_t buffer_type, const uint8_t* source, const size_t write_len) {
-	if (!instance || !source || write_len == 0) return 0;
-
-	sdtp_buffer_t* buffer = sdtp_buffer_get_by_type(instance, buffer_type);
-	if (!buffer) return 0;
-
-	// If incoming data is larger than capacity, return error
-	if (write_len >= buffer->size) {
-		return 0;
-	}
+size_t sdtp_buffer_write(sdtp_buffer_t* buffer, const uint8_t* source, const size_t write_len) {
+	if (!buffer || !source || write_len == 0) return 0;
 
 	const size_t used_space = sdtp_buffer_get_used_space(buffer);
 	const size_t free_space = buffer->size - used_space;
@@ -86,11 +71,8 @@ size_t sdtp_buffer_write(sdtp_instance_t* instance, const sdtp_buffer_type_t buf
 	return write_len;
 }
 
-size_t sdtp_buffer_read(sdtp_instance_t* instance, const sdtp_buffer_type_t buffer_type, uint8_t* destination, size_t read_len, const sdtp_read_mode_t mode) {
-	if (!instance || !destination || read_len == 0) return 0;
-
-	sdtp_buffer_t* buffer = sdtp_buffer_get_by_type(instance, buffer_type);
-	if (!buffer) return 0;
+size_t sdtp_buffer_read(sdtp_buffer_t* buffer, uint8_t* destination, size_t read_len, const sdtp_read_mode_t mode) {
+	if (!buffer || !destination || read_len == 0) return 0;
 
 	const size_t used_space = sdtp_buffer_get_used_space(buffer);
 
@@ -104,11 +86,13 @@ size_t sdtp_buffer_read(sdtp_instance_t* instance, const sdtp_buffer_type_t buff
 	// Handle different read modes
 	switch (mode) {
 		case SDTP_READ_FULL:
+			// Clear buffer
 			memset(buffer->data, 0, buffer->size);
 			buffer->tail = buffer->data;
 			break;
 
 		case SDTP_READ_PARTIAL:
+			// Shift data
 			if (read_len < used_space) {
 				memmove(buffer->data, buffer->data + read_len, used_space - read_len);
 			}
@@ -138,16 +122,17 @@ void sdtp_buffer_clear(sdtp_instance_t* instance, const sdtp_buffer_type_t buffe
 }
 
 size_t sdtp_buffer_get_used_space(const sdtp_buffer_t* buffer) {
+	if (!buffer || !buffer->data) return 0;
 	return buffer->tail - buffer->data;
 }
 
 sdtp_buffer_t* sdtp_buffer_get_by_type(sdtp_instance_t* instance, const sdtp_buffer_type_t buffer_type) {
 	if (!instance) return NULL;
 
-	if (buffer_type == SDTP_OUTPUT_BUFFER) {
+	if (buffer_type == SDTP_OUTPUT_BUFFER && instance->output_buffer) {
 		return instance->output_buffer;
 	}
-	if (buffer_type == SDTP_INPUT_BUFFER) {
+	if (buffer_type == SDTP_INPUT_BUFFER && instance->input_buffer) {
 		return instance->input_buffer;
 	}
 

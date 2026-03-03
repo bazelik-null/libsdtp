@@ -15,7 +15,7 @@ sdtp_instance_t* sdtp_instance_create(const sdtp_config_t* config) {
 	sdtp_instance_t* instance = (sdtp_instance_t*)malloc(sizeof(*instance));
 	if (!instance) return NULL;
 
-	// Set config pointer
+	// Set config
 	instance->config = *config;
 
 	// Allocate buffers
