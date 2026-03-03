@@ -1,6 +1,4 @@
-//
-// Created by niko on 23.02.2026.
-//
+// Copyright (c) 2026 bazelik
 
 // libsdtp Hardware Abstraction Layer
 

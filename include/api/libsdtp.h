@@ -1,6 +1,4 @@
-/**
- * Created by niko on 08.02.2026.
- **/
+// Copyright (c) 2026 bazelik
 
 #ifndef SDTP_H
 #define SDTP_H
