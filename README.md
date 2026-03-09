@@ -71,7 +71,9 @@ void send_packet() {
 
     // If construction was successful write it to the output buffer and clear memory.
 	if (packet) {
-		sdtp_write_packet(instance, packet);
+		const bool is_success = sdtp_write_packet(instance, packet);
+		if (!is_success) { /* Handle error */ }
+
 		sdtp_packet_free(packet);
 	}
 }
@@ -98,9 +100,7 @@ void app_main() {
       .input_bus_pin = INPUT_PIN,
       .output_bus_pin = OUTPUT_PIN,
       .buffer_size = 4096,
-      .baud_rate = 115200,
-      .device_id = esp_random(),
-      .device_type = SDTP_CONTROLLER
+      .baud_rate = 115200
   };
 
   // Create a new SDTP instance.
