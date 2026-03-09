@@ -17,13 +17,6 @@ extern "C" {
 // INSTANCE AND CONFIG //
 
 /**
- * TODO: Implement more device types.
- **/
-typedef enum sdtp_device_type_t {
-	SDTP_CONTROLLER = 0
-} sdtp_device_type_t;
-
-/**
  * Buffer types.
  * Can be either input or output buffer.
  **/
@@ -33,16 +26,12 @@ typedef enum sdtp_buffer_type_t {
 } sdtp_buffer_type_t;
 
 /**
- * Linear buffer. 
- * Type: Last In Last Out.
- * @param type Buffer type (either input or output).
+ * LILO linear buffer for storing serial data.
  * @param size Total buffer size.
  * @param tail Current position.
  * @param data Pointer to start of the buffer memory.
  **/
 typedef struct sdtp_buffer_t {
-	sdtp_buffer_type_t type;
-
 	size_t size;
 
 	uint8_t* tail;
@@ -68,8 +57,6 @@ typedef enum sdtp_read_mode_t {
  * @param output_bus_pin Port number for output channel.
  * @param buffer_size Buffers size.
  * @param baud_rate Baud rate (bits per second).
- * @param device_id Device ID.
- * @param device_type Type of the device (enum sdtp_device_type_t).
  **/
 typedef struct sdtp_config_t {
 	uint8_t input_bus_pin;
@@ -78,14 +65,11 @@ typedef struct sdtp_config_t {
 	size_t buffer_size;
 
 	uint32_t baud_rate;
-
-	uint32_t device_id;
-	sdtp_device_type_t device_type;
 } sdtp_config_t;
 
 /**
- * Single SDTP instance. 
- * Contains I/O buffers and config. 
+ * Single SDTP instance.
+ * Contains I/O buffers and config.
  * Should be created only with sdtp_instance_create().
  **/
 typedef struct sdtp_instance_t {
@@ -105,11 +89,10 @@ typedef enum sdtp_packet_type_t {
 	SDTP_DISCONNECT  = 1,
 	SDTP_ERROR       = 2,
 	SDTP_DATA_PACKET = 3,
-	SDTP_DATA_STREAM = 4
 } sdtp_packet_type_t;
 
 /**
- * Header section of the packet. 
+ * Header section of the packet.
  * Contains:
  * @param id Packet ID
  * @param data_size Body block size in bytes
@@ -124,8 +107,8 @@ typedef struct sdtp_packet_header_t {
 } sdtp_packet_header_t;
 
 /**
- * Standard SDTP packet. 
- * Contains packet header and body. 
+ * Standard SDTP packet.
+ * Contains packet header and body.
  * Should be created only with sdtp_construct_packet().
  **/
 typedef struct sdtp_packet_t {
@@ -133,23 +116,23 @@ typedef struct sdtp_packet_t {
 	uint8_t* body;               // Packet body
 } sdtp_packet_t;
 
-/**
+/*******************************************************
  * Serialized packet layout:
  * Start of heading: 1 byte
  * Header: 4 * uint32_t (id, data_size, type, checksum)
  * Body: data_size bytes
  * Terminator: 1 byte
- **/
+ ******************************************************/
 
 // INSTANCE MANIPULATION //
 
 /**
- * Creates new SDTP instance and returns pointer to it. 
+ * @brief Creates new SDTP instance and returns pointer to it.
  * Config is copied.
  **/
 sdtp_instance_t* sdtp_instance_create(const sdtp_config_t* config);
 /**
- * Frees and closes instance.
+ * @brief Frees and closes instance.
  * Config is not freed.
  **/
 void sdtp_instance_close(sdtp_instance_t* instance);
@@ -157,7 +140,7 @@ void sdtp_instance_close(sdtp_instance_t* instance);
 // PACKET MANIPULATION //
 
 /**
- * Allocates and constructs a new packet. 
+ * @brief Allocates and constructs a new packet.
  * Caller must free returned pointer.
  * @param data Buffer with packet data.
  * @param packet_type Type of the packet (enum sdtp_packet_type_t)
@@ -165,13 +148,13 @@ void sdtp_instance_close(sdtp_instance_t* instance);
  **/
 sdtp_packet_t* sdtp_construct_packet(const char* data, sdtp_packet_type_t packet_type);
 /**
- * Frees packet and body data.
+ * @brief Frees packet and body data.
  **/
 void sdtp_packet_free(sdtp_packet_t* packet);
 
 /**
- * Serializes packet to a newly allocated buffer.
- * Returned data is in host byte order. 
+ * @brief Serializes packet to a newly allocated buffer.
+ * Returned data is in host byte order.
  * Caller must free returned pointer.
  * @param packet Pointer to target packet.
  * @param out_size Var which receives the size in bytes of the returned buffer.
@@ -179,8 +162,8 @@ void sdtp_packet_free(sdtp_packet_t* packet);
  **/
 uint8_t* sdtp_serialize_packet(const sdtp_packet_t* packet, size_t* out_size);
 /**
- * Deserializes raw byte data from a buffer to a newly allocated packet.
- * Returned data is in sender host byte order. 
+ * @brief Deserializes raw byte data from a buffer to a newly allocated packet.
+ * Returned data is in sender host byte order.
  * Caller must free returned pointer.
  * @param buffer Buffer with serialized target packet.
  * @param buf_size Size of the buffer.
@@ -191,21 +174,20 @@ sdtp_packet_t* sdtp_deserialize_packet(const uint8_t* buffer, size_t buf_size);
 // BUFFER MANIPULATION //
 
 /**
- * Creates a new buffer.
+ * @brief Creates a new buffer.
  * Caller must free returned pointer.
  * @param config Pointer to SDTP configuration.
- * @param type Buffer type (either input or output) (enum sdtp_buffer_type_t).
  * @return Pointer to allocated data buffer.
  **/
-sdtp_buffer_t* sdtp_buffer_create(const sdtp_config_t* config, sdtp_buffer_type_t type);
+sdtp_buffer_t* sdtp_buffer_create(const sdtp_config_t* config);
 /**
- * Frees buffer and data. 
- * Caller must set buffer pointer to NULL. 
+ * @brief Frees buffer and data.
+ * Caller must set buffer pointer to NULL.
  **/
 void sdtp_buffer_free(sdtp_buffer_t* buffer);
 
 /**
- * Writes byte stream into the buffer.
+ * @brief Writes byte stream into the buffer.
  * @param buffer Buffer to write.
  * @param source Buffer with data to write.
  * @param write_len Buffer length.
@@ -213,7 +195,7 @@ void sdtp_buffer_free(sdtp_buffer_t* buffer);
  **/
 size_t sdtp_buffer_write(sdtp_buffer_t* buffer, const uint8_t* source, size_t write_len);
 /**
- * Reads byte stream from the buffer.
+ * @brief Reads byte stream from the buffer.
  * @param buffer Buffer to read.
  * @param destination Buffer into which data will be copied.
  * @param read_len Length to read.
@@ -223,25 +205,25 @@ size_t sdtp_buffer_write(sdtp_buffer_t* buffer, const uint8_t* source, size_t wr
 size_t sdtp_buffer_read(sdtp_buffer_t* buffer, uint8_t* destination, size_t read_len, sdtp_read_mode_t mode);
 
 /**
- * Clears buffer.
+ * @brief Clears buffer.
  * @param instance SDTP instance.
- * @param buffer_type Buffer type (either input or output) (enum sdtp_buffer_type_t).
+ * @param buffer_type Type of buffer to clear.
  **/
 void sdtp_buffer_clear(sdtp_instance_t* instance, sdtp_buffer_type_t buffer_type);
 
 /**
- * Gets used buffer space.
+ * @brief Gets used buffer space.
  **/
 size_t sdtp_buffer_get_used_space(const sdtp_buffer_t* buffer);
 /**
- * Gets pointer to a buffer from an SDTP instance by type.
+ * @brief Gets pointer to a buffer from an SDTP instance by type.
  **/
 sdtp_buffer_t* sdtp_buffer_get_by_type(sdtp_instance_t* instance, sdtp_buffer_type_t buffer_type);
 
 // I/O MANIPULATION //
 
 /**
- * Writes a single packet into output buffer.
+ * @brief Writes a single packet into output buffer.
  * Packet is not freed.
  * @param instance SDTP instance.
  * @param packet Packet to write.
@@ -249,7 +231,7 @@ sdtp_buffer_t* sdtp_buffer_get_by_type(sdtp_instance_t* instance, sdtp_buffer_ty
  **/
 bool sdtp_write_packet(sdtp_instance_t* instance, const sdtp_packet_t* packet);
 /**
- * Reads a single packet from the input buffer and returns pointer to it.
+ * @brief Reads a single packet from the input buffer and returns pointer to it.
  * Caller must free returned pointer.
  * @param instance SDTP instance.
  * @param mode Reading mode (enum sdtp_read_mode_t).
@@ -260,13 +242,13 @@ sdtp_packet_t* sdtp_read_packet(sdtp_instance_t* instance, sdtp_read_mode_t mode
 // MISC //
 
 /**
- * Converts packet data to char.
+ * @brief Converts packet data to char.
  * Caller must free returned and packet pointer.
  * @return packet->body converted from raw bytes to null-terminated char.
  */
 char* sdtp_get_char_data(const sdtp_packet_t* packet);
 /**
- * Converts chars to uint8_t.
+ * @brief Converts chars to uint8_t.
  * Caller must free returned and source buffer pointer.
  * @param source Buffer with data to convert.
  * @param data_len Converted bytes length.
@@ -275,11 +257,11 @@ char* sdtp_get_char_data(const sdtp_packet_t* packet);
 uint8_t* sdtp_char_to_bytes(const char* source, size_t* data_len);
 
 /**
- * Calculates Fletcher-32 checksum
+ * @brief Calculates Fletcher-32 checksum
  */
 uint32_t sdtp_calculate_fletcher32(const uint8_t *data, size_t len);
 /**
- * Verifies Fletcher-32 checksum
+ * @brief Verifies Fletcher-32 checksum
  */
 bool sdtp_verify_fletcher32(const uint8_t *data, size_t length, uint32_t checksum);
 

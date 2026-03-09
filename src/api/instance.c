@@ -17,8 +17,8 @@ sdtp_instance_t* sdtp_instance_create(const sdtp_config_t* config) {
 	instance->config = *config;
 
 	// Allocate buffers
-	instance->input_buffer = sdtp_buffer_create(config, SDTP_INPUT_BUFFER);
-	instance->output_buffer = sdtp_buffer_create(config, SDTP_OUTPUT_BUFFER);
+	instance->input_buffer = sdtp_buffer_create(config);
+	instance->output_buffer = sdtp_buffer_create(config);
 
 	// If buffers allocation failed
 	if (!instance->input_buffer || !instance->output_buffer) {

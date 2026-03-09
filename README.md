@@ -13,7 +13,7 @@
 This protocol is suitable for **microcontrollers**, **sensors**, and **input/output devices**. <br>
 **SDTP** implements a peer-to-peer (**P2P**) network architecture. **Client-server** and **Master-Slave** architecture also can be implemented at the software level. <br>
 
-**libsdtp** is written on **C** with minimal use of third-party libraries.<br>
+**libsdtp** is written on **C** with minimal use of third-party libraries and code is fully documented using **doxygen-style** comments.<br>
 This protocol was initially developed as a college project, but now it's available for community use.
 
 # Security

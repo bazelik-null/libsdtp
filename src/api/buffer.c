@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-sdtp_buffer_t* sdtp_buffer_create(const sdtp_config_t* config, const sdtp_buffer_type_t type) {
+sdtp_buffer_t* sdtp_buffer_create(const sdtp_config_t* config) {
 	if (config->buffer_size <= 0) return NULL;
 
 	// Allocate buffer struct
@@ -25,7 +25,6 @@ sdtp_buffer_t* sdtp_buffer_create(const sdtp_config_t* config, const sdtp_buffer
 
 	// Init variables
 	buffer->size = config->buffer_size;
-	buffer->type = type;
 
 	return buffer;
 }
