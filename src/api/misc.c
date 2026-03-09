@@ -17,12 +17,6 @@ char* sdtp_get_char_data(const sdtp_packet_t* packet) {
 	char* body_buffer = malloc(packet->header.data_size + 1);
 	if (body_buffer == NULL) return NULL;
 
-	// Check if body size is equal to data_size
-	if (sizeof(body) != packet->header.data_size + 1) {
-		free(body_buffer);
-		return NULL;
-	}
-
 	// Copy the bytes to a buffer
 	memcpy(body_buffer, (const char*)body, packet->header.data_size);
 
@@ -35,11 +29,7 @@ char* sdtp_get_char_data(const sdtp_packet_t* packet) {
 uint8_t* sdtp_char_to_bytes(const char* source, size_t* data_len) {
 	if (source == NULL || data_len == NULL) return NULL;
 
-	*data_len = sizeof(source);
-
-	if (*data_len == 0) {
-		return NULL;
-	}
+	*data_len = strlen(source);
 
 	uint8_t* byte_buffer = malloc(*data_len);
 	if (byte_buffer == NULL) return NULL;
