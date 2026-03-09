@@ -11,10 +11,13 @@
 **libsdtp** is an open-source library implementing **SDTP** protocol. <br>
 **Structured Data Transfer Protocol** (**SDTP**) is a project which aims to create a **flexible**, and **user-friendly** hardware-level data transmission protocol for physical data exchange between electronic devices. <br>
 This protocol is suitable for **microcontrollers**, **sensors**, and **input/output devices**. <br>
-**SDTP** implements a peer-to-peer (**P2P**) network architecture. **Client-server** and **Master-Slave** architecture also can be implemented at the software level.
+**SDTP** implements a peer-to-peer (**P2P**) network architecture. **Client-server** and **Master-Slave** architecture also can be implemented at the software level. <br>
 
 **libsdtp** is written on **C** with minimal use of third-party libraries.<br>
 This protocol was initially developed as a college project, but now it's available for community use.
+
+# Security
+**libsdtp** implements many validation checks throughout it's API to prevent crashes and undefined behavior. While incorrect usage may still affect software stability, the library is designed with security and stability as a priority. All received and transmitted data are verified using Fletcher-32 checksums.
 
 # Architecture
 **libsdtp** consists of two isolated layers: **API** and **HAL (drivers)**. <br>
