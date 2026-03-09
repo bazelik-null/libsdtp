@@ -9,6 +9,7 @@ extern "C" {
 
 #include <stdint.h>
 #include <stddef.h>
+#include <stdbool.h>
 
 #define SDTP_TERMINATOR (uint8_t)0x04
 #define SDTP_START_OF_HEADER (uint8_t)0x02
@@ -93,20 +94,6 @@ typedef struct sdtp_instance_t {
 	sdtp_buffer_t* input_buffer;
 	sdtp_buffer_t* output_buffer;
 } sdtp_instance_t;
-
-// ERRORS //
-
-/**
- * Error types.
- * Errors are negative. OK = 0.
- **/
-typedef enum sdtp_status_code_t {
-	SDTP_INVALID_CONNECTION = -4,
-	SDTP_INVALID_PACKET     = -3,
-	SDTP_BUFFER_FAIL        = -2,
-	SDTP_UNDEFINED          = -1,
-	SDTP_OK                 = 0
-} sdtp_status_code_t;
 
 // PACKETS //
 
@@ -226,7 +213,7 @@ void sdtp_buffer_free(sdtp_buffer_t* buffer);
  **/
 size_t sdtp_buffer_write(sdtp_buffer_t* buffer, const uint8_t* source, size_t write_len);
 /**
- * Reads byte stream from the buffer and returns read length.
+ * Reads byte stream from the buffer.
  * @param buffer Buffer to read.
  * @param destination Buffer into which data will be copied.
  * @param read_len Length to read.
@@ -258,9 +245,9 @@ sdtp_buffer_t* sdtp_buffer_get_by_type(sdtp_instance_t* instance, sdtp_buffer_ty
  * Packet is not freed.
  * @param instance SDTP instance.
  * @param packet Packet to write.
- * @return Status code (0 = Success)
+ * @return Status (false - error, true - success).
  **/
-sdtp_status_code_t sdtp_write_packet(sdtp_instance_t* instance, const sdtp_packet_t* packet);
+bool sdtp_write_packet(sdtp_instance_t* instance, const sdtp_packet_t* packet);
 /**
  * Reads a single packet from the input buffer and returns pointer to it.
  * Caller must free returned pointer.
@@ -286,6 +273,15 @@ char* sdtp_get_char_data(const sdtp_packet_t* packet);
  * @return Buffer with converted data.
  */
 uint8_t* sdtp_char_to_bytes(const char* source, size_t* data_len);
+
+/**
+ * Calculates Fletcher-32 checksum
+ */
+uint32_t sdtp_calculate_fletcher32(const uint8_t *data, size_t len);
+/**
+ * Verifies Fletcher-32 checksum
+ */
+bool sdtp_verify_fletcher32(const uint8_t *data, size_t length, uint32_t checksum);
 
 #ifdef __cplusplus
 }

@@ -49,3 +49,43 @@ uint8_t* sdtp_char_to_bytes(const char* source, size_t* data_len) {
 
 	return byte_buffer;
 }
+
+// Adapted from Wikipedia's Fletcher checksum article
+// https://en.wikipedia.org/wiki/Fletcher%27s_checksum
+// Original content licensed under CC BY-SA
+uint32_t sdtp_calculate_fletcher32(const uint8_t *data, const size_t len)
+{
+	uint32_t c0, c1;
+	uint i;
+
+	size_t word_len = len / 2;
+	const uint16_t *data16 = (const uint16_t *)data;
+
+	for (c0 = c1 = 0; word_len >= 360; word_len -= 360) {
+		for (i = 0; i < 360; ++i) {
+			c0 = c0 + *data16++;
+			c1 = c1 + c0;
+		}
+		c0 = c0 % 65535;
+		c1 = c1 % 65535;
+	}
+
+	for (i = 0; i < word_len; ++i) {
+		c0 = c0 + *data16++;
+		c1 = c1 + c0;
+	}
+
+	if (len & 1) {
+		c0 = c0 + ((uint8_t *)data16)[0];
+		c1 = c1 + c0;
+	}
+
+	c0 = c0 % 65535;
+	c1 = c1 % 65535;
+
+	return (c1 << 16 | c0);
+}
+
+bool sdtp_verify_fletcher32(const uint8_t *data, const size_t length, const uint32_t checksum) {
+	return sdtp_calculate_fletcher32(data, length) == checksum;
+}

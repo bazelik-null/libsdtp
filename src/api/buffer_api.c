@@ -4,24 +4,24 @@
 
 #include <stdlib.h>
 
-sdtp_status_code_t sdtp_write_packet(sdtp_instance_t* instance, const sdtp_packet_t* packet) {
-	if (!instance || !packet) return SDTP_UNDEFINED;
+bool sdtp_write_packet(sdtp_instance_t* instance, const sdtp_packet_t* packet) {
+	if (!instance || !packet) return false;
 
 	// Get buffer
 	sdtp_buffer_t* buffer = sdtp_buffer_get_by_type(instance, SDTP_OUTPUT_BUFFER);
 	if (!buffer) {
-		return SDTP_BUFFER_FAIL;
+		return false;
 	}
 
 	// Serialize packet into a temporary buffer
 	size_t serialized_size = 0;
 	uint8_t* serialized = sdtp_serialize_packet(packet, &serialized_size);
-	if (!serialized) return SDTP_INVALID_PACKET;
+	if (!serialized) return false;
 
 	// Ensure serialized packet fits into buffer
 	if (serialized_size > instance->config.buffer_size) {
 		free(serialized);
-		return SDTP_BUFFER_FAIL;
+		return false;
 	}
 
 	// Attempt to write serialized packet into output buffer
@@ -29,11 +29,11 @@ sdtp_status_code_t sdtp_write_packet(sdtp_instance_t* instance, const sdtp_packe
 	free(serialized);
 
 	// If not all bytes were written
-	if (written != serialized_size) return SDTP_BUFFER_FAIL;
+	if (written != serialized_size) return false;
 
 	// TODO: Call HAL and send data.
 
-	return SDTP_OK;
+	return true;
 }
 
 sdtp_packet_t* sdtp_read_packet(sdtp_instance_t* instance, sdtp_read_mode_t mode) {

@@ -21,13 +21,11 @@ sdtp_packet_t* sdtp_construct_packet(const char* data, const sdtp_packet_type_t 
 		return NULL;
 	}
 
-	const uint32_t checksum = 0; // TODO: Calculate checksum
-
 	// Header fields
-	packet->header.id        = (uint32_t)sdtp_hal_rand();      // Random ID
-	packet->header.data_size = body_size;              // Copy data len
-	packet->header.type      = (uint32_t)packet_type; // Copy packet type
-	packet->header.checksum  = checksum;              // Calculated data checksum
+	packet->header.id        = sdtp_hal_rand();                  // Random ID
+	packet->header.data_size = body_size;                        // Copy data len
+	packet->header.type      = (uint32_t)packet_type;            // Copy packet type
+	packet->header.checksum  = sdtp_calculate_fletcher32(body, body_size); // Fletcher-32 checksum
 
 	if (body_size > 0) {
 		// Allocate body
@@ -103,6 +101,7 @@ uint8_t* sdtp_serialize_packet(const sdtp_packet_t* packet, size_t* out_size) {
 		if (remaining < sizeof(element)) { free(buffer); return NULL; }
 		// Copy element
 		memcpy(write_ptr, &element, sizeof(element));
+
 		write_ptr += sizeof(element);
 		remaining -= sizeof(element);
 	}
@@ -159,7 +158,6 @@ sdtp_packet_t* sdtp_deserialize_packet(const uint8_t* buffer, const size_t buf_s
         uint32_t element;
 
         memcpy(&element, read_ptr, sizeof(uint32_t));
-
         header_words[i] = element;
 
         read_ptr += sizeof(uint32_t);
@@ -203,6 +201,14 @@ sdtp_packet_t* sdtp_deserialize_packet(const uint8_t* buffer, const size_t buf_s
     } else {
         packet->body = NULL;
     }
+
+	// Verify checksum
+	if (!sdtp_verify_fletcher32(packet->body, data_size, checksum)) {
+		if (packet->body) free(packet->body);
+		free(packet);
+
+		return NULL;
+	}
 
     // Check terminator
     if (remaining < 1 || *read_ptr != SDTP_TERMINATOR) {
