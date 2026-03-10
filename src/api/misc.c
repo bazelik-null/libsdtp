@@ -14,7 +14,7 @@ char* sdtp_get_char_data(const sdtp_packet_t* packet) {
 	if (body == NULL) return NULL;
 
 	// Allocate a buffer for a null-terminated string
-	char* body_buffer = malloc(packet->header.data_size + 1);
+	char* body_buffer = (char*)malloc(packet->header.data_size + 1);
 	if (body_buffer == NULL) return NULL;
 
 	// Copy the bytes to a buffer
@@ -31,7 +31,7 @@ uint8_t* sdtp_char_to_bytes(const char* source, size_t* data_len) {
 
 	*data_len = strlen(source);
 
-	uint8_t* byte_buffer = malloc(*data_len);
+	uint8_t* byte_buffer = (uint8_t*)malloc(*data_len);
 	if (byte_buffer == NULL) return NULL;
 
 	// Copy the bytes to a buffer
@@ -49,11 +49,13 @@ uint32_t sdtp_calculate_fletcher32(const uint8_t *data, const size_t len)
 	uint i;
 
 	size_t word_len = len / 2;
-	const uint16_t *data16 = (const uint16_t *)data;
 
 	for (c0 = c1 = 0; word_len >= 360; word_len -= 360) {
 		for (i = 0; i < 360; ++i) {
-			c0 = c0 + *data16++;
+			uint16_t word;
+			memcpy(&word, data, sizeof(word));
+			data += 2;
+			c0 = c0 + word;
 			c1 = c1 + c0;
 		}
 		c0 = c0 % 65535;
@@ -61,12 +63,15 @@ uint32_t sdtp_calculate_fletcher32(const uint8_t *data, const size_t len)
 	}
 
 	for (i = 0; i < word_len; ++i) {
-		c0 = c0 + *data16++;
+		uint16_t word;
+		memcpy(&word, data, sizeof(word));
+		data += 2;
+		c0 = c0 + word;
 		c1 = c1 + c0;
 	}
 
 	if (len & 1) {
-		c0 = c0 + ((uint8_t *)data16)[0];
+		c0 = c0 + data[0];
 		c1 = c1 + c0;
 	}
 

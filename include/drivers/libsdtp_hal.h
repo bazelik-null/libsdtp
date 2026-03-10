@@ -73,7 +73,7 @@ void sdtp_hal_transmit_one(uint8_t channel, uint32_t delay);
  * Generates a random value.
  * @return Value.
  */
-uint32_t sdtp_hal_rand();
+uint32_t sdtp_hal_rand(void);
 
 #ifdef __cplusplus
 }

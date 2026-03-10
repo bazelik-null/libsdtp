@@ -9,7 +9,7 @@ sdtp_buffer_t* sdtp_buffer_create(const sdtp_config_t* config) {
 	if (config->buffer_size <= 0) return NULL;
 
 	// Allocate buffer struct
-	sdtp_buffer_t* buffer = malloc(sizeof(sdtp_buffer_t));
+	sdtp_buffer_t* buffer = (sdtp_buffer_t*)malloc(sizeof(sdtp_buffer_t));
 	if (!buffer) {
 		return NULL;
 	}
@@ -96,8 +96,7 @@ size_t sdtp_buffer_read(sdtp_buffer_t* buffer, uint8_t* destination, size_t read
 			buffer->tail -= read_len;
 			break;
 
-		case SDTP_READ_PEEK:
-			// Do nothing, just return data
+		default:
 			break;
 	}
 
@@ -120,7 +119,7 @@ void sdtp_buffer_clear(sdtp_instance_t* instance, const sdtp_buffer_type_t buffe
 
 size_t sdtp_buffer_get_used_space(const sdtp_buffer_t* buffer) {
 	if (!buffer || !buffer->data) return 0;
-	return buffer->tail - buffer->data;
+	return (size_t)(buffer->tail - buffer->data);
 }
 
 sdtp_buffer_t* sdtp_buffer_get_by_type(sdtp_instance_t* instance, const sdtp_buffer_type_t buffer_type) {

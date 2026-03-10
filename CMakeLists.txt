@@ -3,12 +3,47 @@ project(sdtp LANGUAGES C VERSION 1.0 DESCRIPTION "sdtp")
 
 set(CMAKE_C_STANDARD 11)
 
+# Clang
+add_compile_options(
+        -Wall
+        -Wextra
+        -Wstrict-prototypes
+        -Wmissing-prototypes
+        -Wmissing-declarations
+        -Wwrite-strings
+        -Wconversion
+        -Wshadow
+        -Wpointer-arith
+        -Wcast-qual
+        -Wcast-align
+        -Wdouble-promotion
+        -Wnull-dereference
+        -Werror
+)
+
+# Sanitizers for Debug builds
+if(CMAKE_BUILD_TYPE MATCHES Debug)
+    add_compile_options(
+            -fsanitize=address
+            -fsanitize=undefined
+            -fsanitize=nullability
+            -fno-omit-frame-pointer
+            -g
+    )
+    add_link_options(
+            -fsanitize=address
+            -fsanitize=undefined
+            -fsanitize=nullability
+    )
+endif()
+
 add_library(sdtp SHARED
         src/api/buffer.c
         src/api/packet.c
         src/api/instance.c
         src/api/buffer_api.c
-        src/api/misc.c)
+        src/api/misc.c
+        src/drivers/placeholder.c)
 
 set_target_properties(sdtp PROPERTIES VERSION ${PROJECT_VERSION})
 set_target_properties(sdtp PROPERTIES PUBLIC_HEADER include/api/libsdtp.h)

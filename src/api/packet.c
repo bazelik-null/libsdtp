@@ -14,6 +14,10 @@ sdtp_packet_t* sdtp_construct_packet(const char* data, const sdtp_packet_type_t 
 	uint8_t* body = sdtp_char_to_bytes(data, &body_size);
 	if (!body) return NULL;
 
+	// Prevent int overflow
+	if (body_size > UINT32_MAX) return NULL;
+	const uint32_t body_size32 = (uint32_t)body_size;
+
 	// Allocate packet struct
 	sdtp_packet_t* packet = (sdtp_packet_t*)malloc(sizeof(sdtp_packet_t));
 	if (!packet) {
@@ -23,7 +27,7 @@ sdtp_packet_t* sdtp_construct_packet(const char* data, const sdtp_packet_type_t 
 
 	// Header fields
 	packet->header.id        = sdtp_hal_rand();                  // Random ID
-	packet->header.data_size = body_size;                        // Copy data len
+	packet->header.data_size = body_size32;                        // Copy data len
 	packet->header.type      = (uint32_t)packet_type;            // Copy packet type
 	packet->header.checksum  = sdtp_calculate_fletcher32(body, body_size); // Fletcher-32 checksum
 
