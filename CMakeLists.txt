@@ -1,28 +1,29 @@
-cmake_minimum_required(VERSION 4.2)
+cmake_minimum_required(VERSION 3.12)
 project(sdtp LANGUAGES C VERSION 1.0 DESCRIPTION "sdtp")
 
 set(CMAKE_C_STANDARD 11)
 
-# Clang
-add_compile_options(
-        -Wall
-        -Wextra
-        -Wstrict-prototypes
-        -Wmissing-prototypes
-        -Wmissing-declarations
-        -Wwrite-strings
-        -Wconversion
-        -Wshadow
-        -Wpointer-arith
-        -Wcast-qual
-        -Wcast-align
-        -Wdouble-promotion
-        -Wnull-dereference
-        -Werror
-)
+if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU")
+    add_compile_options(
+            -Wall
+            -Wextra
+            -Wstrict-prototypes
+            -Wmissing-prototypes
+            -Wmissing-declarations
+            -Wwrite-strings
+            -Wconversion
+            -Wshadow
+            -Wpointer-arith
+            -Wcast-qual
+            -Wcast-align
+            -Wdouble-promotion
+            -Wnull-dereference
+            -Werror
+    )
+endif()
 
 # Sanitizers for Debug builds
-if(CMAKE_BUILD_TYPE MATCHES Debug)
+if(CMAKE_BUILD_TYPE MATCHES Debug AND CMAKE_C_COMPILER_ID MATCHES "Clang")
     add_compile_options(
             -fsanitize=address
             -fsanitize=undefined
