@@ -26,6 +26,3 @@ jobs:
 
       - name: Build
         run: cmake --build build --verbose
-
-      - name: Install
-        run: cmake --install build
