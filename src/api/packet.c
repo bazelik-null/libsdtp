@@ -1,12 +1,11 @@
 // Copyright (c) 2026 bazelik
 
 #include <api/libsdtp.h>
-#include <drivers/libsdtp_hal.h>
 
 #include <stdlib.h>
 #include <string.h>
 
-sdtp_packet_t* sdtp_construct_packet(const char* data, const sdtp_packet_type_t packet_type)
+sdtp_packet_t* sdtp_construct_packet(const char* data, const sdtp_packet_type_t packet_type, const uint32_t packet_id)
 {
 	if (!data) return NULL;
 
@@ -26,9 +25,9 @@ sdtp_packet_t* sdtp_construct_packet(const char* data, const sdtp_packet_type_t 
 	}
 
 	// Header fields
-	packet->header.id        = sdtp_hal_rand();                  // Random ID
-	packet->header.data_size = body_size32;                        // Copy data len
-	packet->header.type      = (uint32_t)packet_type;            // Copy packet type
+	packet->header.id        = packet_id;                                  // Random ID
+	packet->header.data_size = body_size32;                                // Copy data len
+	packet->header.type      = (uint32_t)packet_type;                      // Copy packet type
 	packet->header.checksum  = sdtp_calculate_fletcher32(body, body_size); // Fletcher-32 checksum
 
 	if (body_size > 0) {

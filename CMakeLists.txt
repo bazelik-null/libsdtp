@@ -44,7 +44,8 @@ add_library(sdtp SHARED
         src/api/instance.c
         src/api/buffer_api.c
         src/api/misc.c
-        src/drivers/placeholder.c)
+        src/api/io.c
+)
 
 set_target_properties(sdtp PROPERTIES VERSION ${PROJECT_VERSION})
 set_target_properties(sdtp PROPERTIES PUBLIC_HEADER include/api/libsdtp.h)

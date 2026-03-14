@@ -31,13 +31,18 @@ bool sdtp_write_packet(sdtp_instance_t* instance, const sdtp_packet_t* packet) {
 	// If not all bytes were written
 	if (written != serialized_size) return false;
 
-	// TODO: Call HAL and send data.
+	// Trigger a write call
+	const bool status = sdtp_io_write(instance);
 
-	return true;
+	return status;
 }
 
 sdtp_packet_t* sdtp_read_packet(sdtp_instance_t* instance, sdtp_read_mode_t mode) {
 	if (!instance) return NULL;
+
+	// Trigger a read call
+	const bool status = sdtp_io_read(instance);
+	if (!status) return NULL;
 
 	// Get buffer
 	sdtp_buffer_t* buffer = sdtp_buffer_get_by_type(instance, SDTP_INPUT_BUFFER);

@@ -5,9 +5,10 @@
 #include <stdlib.h>
 #include <time.h>
 
-sdtp_instance_t* sdtp_instance_create(const sdtp_config_t* config) {
+sdtp_instance_t* sdtp_instance_create(const sdtp_config_t* config, const sdtp_function_hooks* gpio_hooks) {
 	if (!config) return NULL;
 	if (config->buffer_size == 0) return NULL;
+	if (!gpio_hooks) return NULL;
 
 	// Allocate an instance
 	sdtp_instance_t* instance = (sdtp_instance_t*)malloc(sizeof(*instance));
@@ -15,6 +16,9 @@ sdtp_instance_t* sdtp_instance_create(const sdtp_config_t* config) {
 
 	// Set config
 	instance->config = *config;
+
+	// Set hooks
+	instance->function_hooks = gpio_hooks;
 
 	// Allocate buffers
 	instance->input_buffer = sdtp_buffer_create(config);

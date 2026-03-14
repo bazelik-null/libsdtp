@@ -11,6 +11,8 @@ extern "C" {
 #include <stddef.h>
 #include <stdbool.h>
 
+#include <hooks/libsdtp_hooks.h>
+
 #define SDTP_TERMINATOR (uint8_t)0x04
 #define SDTP_START_OF_HEADER (uint8_t)0x02
 
@@ -20,7 +22,7 @@ extern "C" {
  * Buffer types.
  * Can be either input or output buffer.
  **/
-typedef enum sdtp_buffer_type_t {
+typedef enum {
 	SDTP_INPUT_BUFFER = 0,
 	SDTP_OUTPUT_BUFFER = 1,
 } sdtp_buffer_type_t;
@@ -31,7 +33,7 @@ typedef enum sdtp_buffer_type_t {
  * @param tail Current position.
  * @param data Pointer to start of the buffer memory.
  **/
-typedef struct sdtp_buffer_t {
+typedef struct {
 	size_t size;
 
 	uint8_t* tail;
@@ -45,7 +47,7 @@ typedef struct sdtp_buffer_t {
  * @param SDTP_READ_PARTIAL Read and clear used data
  * @param SDTP_READ_PEEK Read without modifying buffer
  **/
-typedef enum sdtp_read_mode_t {
+typedef enum {
 	SDTP_READ_FULL,      // Read and clear entire buffer
 	SDTP_READ_PARTIAL,   // Read and clear used data
 	SDTP_READ_PEEK       // Read without modifying buffer
@@ -58,7 +60,7 @@ typedef enum sdtp_read_mode_t {
  * @param buffer_size Buffers size.
  * @param baud_rate Baud rate (bits per second).
  **/
-typedef struct sdtp_config_t {
+typedef struct {
 	uint8_t input_bus_pin;
 	uint8_t output_bus_pin;
 
@@ -72,11 +74,13 @@ typedef struct sdtp_config_t {
  * Contains I/O buffers and config.
  * Should be created only with sdtp_instance_create().
  **/
-typedef struct sdtp_instance_t {
+typedef struct {
 	sdtp_config_t config;
 
 	sdtp_buffer_t* input_buffer;
 	sdtp_buffer_t* output_buffer;
+
+	const sdtp_function_hooks* function_hooks;
 } sdtp_instance_t;
 
 // PACKETS //
@@ -84,7 +88,7 @@ typedef struct sdtp_instance_t {
 /**
  * Packet types.
  **/
-typedef enum sdtp_packet_type_t {
+typedef enum {
 	SDTP_HANDSHAKE   = 0,
 	SDTP_DISCONNECT  = 1,
 	SDTP_ERROR       = 2,
@@ -99,7 +103,7 @@ typedef enum sdtp_packet_type_t {
  * @param type Packet type (enum sdtp_packet_type_t)
  * @param checksum Checksum
  **/
-typedef struct sdtp_packet_header_t {
+typedef struct {
 	uint32_t id;
 	uint32_t data_size;
 	uint32_t type;
@@ -111,7 +115,7 @@ typedef struct sdtp_packet_header_t {
  * Contains packet header and body.
  * Should be created only with sdtp_construct_packet().
  **/
-typedef struct sdtp_packet_t {
+typedef struct {
 	sdtp_packet_header_t header; // Packet header
 	uint8_t* body;               // Packet body
 } sdtp_packet_t;
@@ -130,7 +134,7 @@ typedef struct sdtp_packet_t {
  * @brief Creates new SDTP instance and returns pointer to it.
  * Config is copied.
  **/
-sdtp_instance_t* sdtp_instance_create(const sdtp_config_t* config);
+sdtp_instance_t* sdtp_instance_create(const sdtp_config_t* config, const sdtp_function_hooks* gpio_hooks);
 /**
  * @brief Frees and closes instance.
  * Config is not freed.
@@ -144,9 +148,10 @@ void sdtp_instance_close(sdtp_instance_t* instance);
  * Caller must free returned pointer.
  * @param data Buffer with packet data.
  * @param packet_type Type of the packet (enum sdtp_packet_type_t)
+ * @param packet_id Packet ID (must be random).
  * @return Pointer to allocated packet struct.
  **/
-sdtp_packet_t* sdtp_construct_packet(const char* data, sdtp_packet_type_t packet_type);
+sdtp_packet_t* sdtp_construct_packet(const char* data, sdtp_packet_type_t packet_type, uint32_t packet_id);
 /**
  * @brief Frees packet and body data.
  **/
@@ -220,7 +225,7 @@ size_t sdtp_buffer_get_used_space(const sdtp_buffer_t* buffer);
  **/
 sdtp_buffer_t* sdtp_buffer_get_by_type(sdtp_instance_t* instance, sdtp_buffer_type_t buffer_type);
 
-// I/O MANIPULATION //
+// INSTANCE BUFFER MANIPULATION //
 
 /**
  * @brief Writes a single packet into output buffer.
@@ -238,6 +243,19 @@ bool sdtp_write_packet(sdtp_instance_t* instance, const sdtp_packet_t* packet);
  * @return Pointer to allocated packet struct.
  **/
 sdtp_packet_t* sdtp_read_packet(sdtp_instance_t* instance, sdtp_read_mode_t mode);
+
+// IO MANIPULATION //
+
+/**
+ * @brief Writes data from output buffer to IO output via function hook.
+ * @return Status (false - error, true - success).
+ **/
+bool sdtp_io_write(sdtp_instance_t* instance);
+/**
+ * @brief Writes data from IO input to input buffer via function hook.
+ * @return Status (false - error, true - success).
+ */
+bool sdtp_io_read(sdtp_instance_t* instance);
 
 // MISC //
 
