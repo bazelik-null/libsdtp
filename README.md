@@ -1,3 +1,8 @@
+> [!WARNING]
+>
+> NO LONGER MAINTAINED. MIGRATED TO CODEBERG
+> https://codeberg.org/bazelik-dev/libsdtp
+
 <div align="center">
 <h1> SDTP library </h1>
 <img src="doc/img/sdtp_logo.png" width="500">
